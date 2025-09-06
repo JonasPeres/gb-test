@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,7 +29,8 @@ describe('App e2e', () => {
     await app.close();
   });
 
-  it('GET /skus (lista vazia com paginação)', async () => {
+  it('GET /skus (empty list with pagination)', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const res = await request(app.getHttpServer())
       .get('/skus?page=1&limit=10')
       .expect(200);

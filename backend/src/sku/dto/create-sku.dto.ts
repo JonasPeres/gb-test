@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Status } from '@prisma/client/wasm';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreateSkuDto {
@@ -8,9 +9,9 @@ export class CreateSkuDto {
 
   @ApiProperty({
     required: false,
-    enum: ['PRE_CADASTRO', 'CADASTRO_COMPLETO', 'ATIVO', 'DESATIVADO', 'CANCELADO'],
+    enum: Status,
   })
   @IsOptional()
-  @IsEnum(['PRE_CADASTRO', 'CADASTRO_COMPLETO', 'ATIVO', 'DESATIVADO', 'CANCELADO'] as const)
-  status?: any;
+  @IsEnum(Status)
+  status?: Status;
 }

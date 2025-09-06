@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PrismaExceptionFilter } from '../common/filters/prisma-exception.filter';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalFilters(new PrismaExceptionFilter());
@@ -17,8 +17,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const doc = SwaggerModule.createDocument(app, cfg);
-  SwaggerModule.setup('docs', app, doc); // http://localhost:3000/docs
+  SwaggerModule.setup('docs', app, doc);
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env['PORT'] || 3000);
 }
-bootstrap();
+
+void bootstrap();

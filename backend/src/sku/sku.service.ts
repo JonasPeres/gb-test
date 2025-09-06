@@ -1,33 +1,26 @@
+import { Sku, Status } from '@prisma/client/wasm';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   Injectable,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { Status as PrismaStatus } from '@prisma/client';
-
-type Status =
-  | 'PRE_CADASTRO'
-  | 'CADASTRO_COMPLETO'
-  | 'ATIVO'
-  | 'DESATIVADO'
-  | 'CANCELADO';
 
 @Injectable()
 export class SkuService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private ensureExists = async (id: string) => {
-    const found = await this.prisma.sku.findUnique({ where: { id } });
+  private ensureExists = async (id: string): Promise<Sku> => {
+    const found = await this.prisma['sku'].findUnique({ where: { id } });
     if (!found) throw new NotFoundException('SKU não encontrado');
     return found;
   };
 
   private allowedTransitions: Record<Status, Status[]> = {
-    PRE_CADASTRO: ['CADASTRO_COMPLETO', 'CANCELADO'],
-    CADASTRO_COMPLETO: ['PRE_CADASTRO', 'ATIVO', 'CANCELADO'],
-    ATIVO: ['DESATIVADO'],
-    DESATIVADO: ['ATIVO', 'PRE_CADASTRO'],
+    PRE_CADASTRO: [Status.CADASTRO_COMPLETO, Status.CANCELADO],
+    CADASTRO_COMPLETO: [Status.PRE_CADASTRO, Status.ATIVO, Status.CANCELADO],
+    ATIVO: [Status.DESATIVADO],
+    DESATIVADO: [Status.ATIVO, Status.PRE_CADASTRO],
     CANCELADO: [],
   };
 
@@ -36,30 +29,32 @@ export class SkuService {
     descricaoComercial: string;
     sku: string;
     status?: Status;
-  }) {
-    const status = (data.status ?? 'PRE_CADASTRO') as PrismaStatus;
-    return this.prisma.sku.create({ data: { ...data, status } });
+  }): Promise<Sku> {
+    const status = data.status ?? Status.PRE_CADASTRO;
+    return this.prisma['sku'].create({ data: { ...data, status } });
   }
 
-  async findAll(params: { page?: number; limit?: number; status?: Status }) {
+  async findAll(params: {
+    page?: number | undefined;
+    limit?: number | undefined;
+    status?: Status;
+  }): Promise<{ items: Sku[]; total: number; page: number; pages: number }> {
     const page = Math.max(1, Number(params.page ?? 1));
     const limit = Math.min(100, Math.max(1, Number(params.limit ?? 10)));
-    const where = params.status
-      ? { status: params.status as PrismaStatus }
-      : {};
+    const where = params.status ? { status: params.status } : {};
     const [items, total] = await Promise.all([
-      this.prisma.sku.findMany({
+      this.prisma['sku'].findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.sku.count({ where }),
+      this.prisma['sku'].count({ where }),
     ]);
     return { items, total, page, pages: Math.ceil(total / limit) };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Sku> {
     return this.ensureExists(id);
   }
 
@@ -70,13 +65,13 @@ export class SkuService {
       descricaoComercial: string;
       sku: string;
     }>,
-  ) {
+  ): Promise<Sku> {
     const current = await this.ensureExists(id);
     if (['ATIVO', 'DESATIVADO', 'CANCELADO'].includes(current.status))
       throw new BadRequestException('Edição não permitida neste status');
 
     if (current.status === 'PRE_CADASTRO') {
-      return this.prisma.sku.update({
+      return this.prisma['sku'].update({
         where: { id },
         data: {
           ...(data.descricao !== undefined && { descricao: data.descricao }),
@@ -97,7 +92,7 @@ export class SkuService {
         'Em CADASTRO_COMPLETO apenas descricaoComercial pode ser alterada',
       );
 
-    return this.prisma.sku.update({
+    return this.prisma['sku'].update({
       where: { id },
       data: {
         descricaoComercial: data.descricaoComercial!,
@@ -106,22 +101,22 @@ export class SkuService {
     });
   }
 
-  async transition(id: string, target: Status) {
+  async transition(id: string, target: Status): Promise<Sku> {
     const current = await this.ensureExists(id);
     if (current.status === 'CANCELADO')
       throw new BadRequestException('CANCELADO é status definitivo');
-    const allowed = this.allowedTransitions[current.status as Status];
+    const allowed = this.allowedTransitions[current.status];
     if (!allowed.includes(target))
       throw new BadRequestException('Transição inválida para o status atual');
-    return this.prisma.sku.update({
+    return this.prisma['sku'].update({
       where: { id },
-      data: { status: target as PrismaStatus },
+      data: { status: target },
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<{ ok: boolean }> {
     await this.ensureExists(id);
-    await this.prisma.sku.delete({ where: { id } });
+    await this.prisma['sku'].delete({ where: { id } });
     return { ok: true };
   }
 }

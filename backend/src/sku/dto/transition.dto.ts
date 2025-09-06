@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Status } from '@prisma/client/wasm';
 import { IsEnum } from 'class-validator';
 
 export class TransitionDto {
   @ApiProperty({
-    enum: ['PRE_CADASTRO', 'CADASTRO_COMPLETO', 'ATIVO', 'DESATIVADO', 'CANCELADO'],
+    enum: Status,
   })
-  @IsEnum(['PRE_CADASTRO', 'CADASTRO_COMPLETO', 'ATIVO', 'DESATIVADO', 'CANCELADO'] as const)
-  target!: any;
+  @IsEnum(Status)
+  target!: Status;
 }

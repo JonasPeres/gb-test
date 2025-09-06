@@ -3,20 +3,37 @@ set -e
 
 echo "🏁 API entrypoint: preparando banco e Prisma..."
 
-if [ -d "./prisma/migrations" ] && [ "$(ls -A ./prisma/migrations 2>/dev/null)" ]; then
-  echo "📦 migrations detectadas → prisma migrate deploy"
-  npx prisma migrate deploy
+if npx prisma migrate deploy 2>/dev/null; then
+  echo "📦 migrations aplicadas"
 else
-  echo "🧩 sem migrations → prisma db push (criando schema a partir do modelo)"
+  echo "📦 sem migrations -> prisma db push"
   npx prisma db push
 fi
 
-if [ -f "./prisma/seed.js" ]; then
-  echo "🌱 rodando seed..."
-  node ./prisma/seed.js || echo "seed falhou (ok em dev)"
-else
-  echo "🌱 nenhum seed detectado (pulando)"
+echo "🌱 rodando seed..."
+node prisma/seed.js || true
+echo "Seed concluído"
+
+START_FILE=""
+for CAND in \
+  dist/main.js \
+  dist/src/main.js \
+  dist/main.cjs \
+  dist/src/main.cjs \
+  dist/apps/backend/main.js \
+  dist/apps/backend/src/main.js
+do
+  if [ -f "$CAND" ]; then
+    START_FILE="$CAND"
+    break
+  fi
+done
+
+if [ -z "$START_FILE" ]; then
+  echo "❌ Não encontrei arquivo de entrada em dist/. Conteúdo atual:"
+  ls -la dist || true
+  exit 1
 fi
 
-echo "🚀 iniciando Nest..."
-exec node dist/main.js
+echo "🚀 iniciando Nest em $START_FILE..."
+exec node "$START_FILE"
