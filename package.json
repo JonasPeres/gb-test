@@ -4,13 +4,13 @@
     "lint-staged": "^16.1.6"
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": [
+    "*.{ts,tsx,js,jsx,json,md,css,scss}": [
       "prettier --write"
     ],
     "backend/src/**/*.{ts,js}": [
       "eslint --fix"
     ],
-    "frontend/src/**/*.{ts,js}": [
+    "frontend/src/**/*.{ts,tsx,js,jsx}": [
       "eslint --fix"
     ]
   }

@@ -1,6 +1,15 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-cd backend && npm run test -- --coverage && npm run test:e2e
+set -e
 
-cd frontend && npm run test
+if [ -d "backend" ]; then
+  echo "→ Backend: unit + e2e"
+  (cd backend && npm test -- --coverage && npm run test:e2e)
+fi
+
+if [ -d "frontend" ]; then
+  echo "→ Frontend: tests + build (se existirem)"
+  (cd frontend && npm run test -- --coverage --if-present)
+  (cd frontend && npm run build --if-present)
+fi
