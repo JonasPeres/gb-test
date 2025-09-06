@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+}
+
+enum Status {
+  PRE_CADASTRO
+  CADASTRO_COMPLETO
+  ATIVO
+  DESATIVADO
+  CANCELADO
+}
+
+model Sku {
+  id                 String   @id @default(uuid())
+  descricao          String
+  descricaoComercial String
+  sku                String   @unique
+  status             Status   @default(PRE_CADASTRO)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
