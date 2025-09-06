@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e
 
 echo "🏁 API entrypoint: preparando banco e Prisma..."

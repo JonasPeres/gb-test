@@ -1,6 +1,8 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+
 export class UpdateSkuDto {
-  @IsOptional() @IsString() descricao?: string;
-  @IsOptional() @IsString() descricaoComercial?: string;
-  @IsOptional() @IsString() sku?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() descricao?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() descricaoComercial?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() sku?: string;
 }
