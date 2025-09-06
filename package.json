@@ -1,0 +1,13 @@
+{
+  "lint-staged": {
+    "*.{ts,js,json,md}": [
+      "prettier --write"
+    ],
+    "backend/src/**/*.{ts,js}": [
+      "eslint --fix"
+    ],
+    "frontend/src/**/*.{ts,js}": [
+      "eslint --fix"
+    ]
+  }
+}

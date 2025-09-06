@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd backend && npm run test -- --coverage && npm run test:e2e
+
+cd frontend && npm run test
