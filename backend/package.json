@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "husky install",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -22,8 +21,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed": "ts-node --transpile-only prisma/seed.ts",
-    "prepare": "husky"
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -52,9 +50,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
-    "husky": "^9.1.7",
     "jest": "^29.7.0",
-    "lint-staged": "^16.1.6",
     "prettier": "^3.4.2",
     "prisma": "^6.15.0",
     "source-map-support": "^0.5.21",
@@ -66,13 +62,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "lint-staged": {
-    "*.{ts,js,json,md}": [
-      "prettier --write"
-    ],
-    "src/**/*.{ts,js}": [
-      "eslint --fix"
-    ]
   }
 }
