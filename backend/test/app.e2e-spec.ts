@@ -44,4 +44,12 @@ describe('App e2e', () => {
       }),
     );
   });
+
+  it('GET /health', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health')
+      .expect(200);
+    expect(response.body.ok).toBe(true);
+    expect(response.body).toHaveProperty('uptime');
+  });
 });

@@ -122,6 +122,13 @@ describe('SkuService (rules)', () => {
     expect(page1.total).toBe(15);
   });
 
+  it('list with default pagination', async () => {
+    await svc.create({ descricao: 'A', descricaoComercial: 'B', sku: 'P1' });
+    const result = await svc.findAll({});
+    expect(result.items.length).toBe(1);
+    expect(result.page).toBe(1);
+  });
+
   it('remove: deletes and cannot find anymore', async () => {
     const s = await svc.create({
       descricao: 'A',
