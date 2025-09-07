@@ -8,22 +8,34 @@ import {
 } from "../api/client";
 import type { Sku, SkuStatus } from "../types";
 
-export function useSkus(params: { page: number; status?: SkuStatus }) {
-  const qc = useQueryClient();
-  const list = useQuery({
-    queryKey: ["skus", params.page, params.status],
+interface UseSkusParams {
+  page: number;
+  status?: SkuStatus;
+}
+
+export function useSkus(params: UseSkusParams) {
+  const queryClient = useQueryClient();
+
+  const queryKey = ["skus", params.page, params.status];
+
+  const listSkusQuery = useQuery({
+    queryKey,
     queryFn: () =>
       listSkus({ page: params.page, status: params.status, limit: 4 }),
-    placeholderData: (previousData) => previousData,
   });
 
-  const createM = useMutation({
+  const invalidateSkus = () => {
+    queryClient.invalidateQueries({ queryKey: ["skus"] });
+  };
+
+  const createSkuMutation = useMutation({
     mutationFn: (
       payload: Omit<Sku, "id" | "status"> & { status?: SkuStatus }
     ) => createSku(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["skus"] }),
+    onSuccess: invalidateSkus,
   });
-  const updateM = useMutation({
+
+  const updateSkuMutation = useMutation({
     mutationFn: ({
       id,
       payload,
@@ -31,17 +43,25 @@ export function useSkus(params: { page: number; status?: SkuStatus }) {
       id: Sku["id"];
       payload: Partial<Omit<Sku, "id" | "status">>;
     }) => updateSku(String(id), payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["skus"] }),
-  });
-  const deleteM = useMutation({
-    mutationFn: (id: Sku["id"]) => deleteSku(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["skus"] }),
-  });
-  const transitionM = useMutation({
-    mutationFn: ({ id, status }: { id: Sku["id"]; status: SkuStatus }) =>
-      transitionSku(id, status),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["skus"] }),
+    onSuccess: invalidateSkus,
   });
 
-  return { list, createM, updateM, deleteM, transitionM };
+  const deleteSkuMutation = useMutation({
+    mutationFn: (id: Sku["id"]) => deleteSku(id),
+    onSuccess: invalidateSkus,
+  });
+
+  const transitionSkuMutation = useMutation({
+    mutationFn: ({ id, status }: { id: Sku["id"]; status: SkuStatus }) =>
+      transitionSku(id, status),
+    onSuccess: invalidateSkus,
+  });
+
+  return {
+    listSkusQuery,
+    createSkuMutation,
+    updateSkuMutation,
+    deleteSkuMutation,
+    transitionSkuMutation,
+  };
 }

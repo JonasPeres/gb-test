@@ -1,44 +1,62 @@
-import {
-  Menu,
-  MenuItem,
-  Button,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import React, { useCallback, useMemo, useState } from "react";
+import { Menu, MenuItem, Button, Tooltip } from "@mui/material";
 import { ALLOWED_TRANSITIONS, STATUS_LABELS } from "../../state/transition";
 import type { Sku, SkuStatus } from "../../types";
-import { useState } from "react";
 
-export default function TransitionMenu({
-  sku,
-  onTransition,
-}: {
+type TransitionMenuProps = {
   sku: Sku;
   onTransition: (id: string, status: SkuStatus) => void;
-}) {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+};
+
+const TransitionMenu: React.FC<TransitionMenuProps> = ({
+  sku,
+  onTransition,
+}) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
-  const possible = ALLOWED_TRANSITIONS[sku.status];
+  const allowedTransitions = useMemo(
+    () => ALLOWED_TRANSITIONS[sku.status] || [],
+    [sku.status]
+  );
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    []
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
+
+  const handleTransition = useCallback(
+    (status: SkuStatus) => {
+      onTransition(sku.id, status);
+      handleClose();
+    },
+    [onTransition, sku.id, handleClose]
+  );
 
   return (
     <div>
-      <Button
-        variant="outlined"
-        onClick={handleClick}
-        endIcon={<span style={{ fontSize: 12 }}>▾</span>}
-        size="small"
+      <Tooltip
+        title={!allowedTransitions.length ? "Sem transições possíveis" : ""}
+        disableFocusListener
       >
-        Mudar status
-      </Button>
+        <span>
+          <Button
+            variant="outlined"
+            onClick={handleClick}
+            endIcon={<span style={{ fontSize: 12 }}>▾</span>}
+            size="small"
+            disabled={!allowedTransitions.length}
+          >
+            Mudar status
+          </Button>
+        </span>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -46,28 +64,14 @@ export default function TransitionMenu({
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        {possible.length === 0 ? (
-          <MenuItem disabled>
-            <ListItemText>
-              <Typography variant="body2" color="text.secondary">
-                Sem transições possíveis
-              </Typography>
-            </ListItemText>
+        {allowedTransitions.map((status) => (
+          <MenuItem key={status} onClick={() => handleTransition(status)}>
+            {STATUS_LABELS[status]}
           </MenuItem>
-        ) : (
-          possible.map((p) => (
-            <MenuItem
-              key={p}
-              onClick={() => {
-                onTransition(sku.id, p);
-                handleClose();
-              }}
-            >
-              {STATUS_LABELS[p]}
-            </MenuItem>
-          ))
-        )}
+        ))}
       </Menu>
     </div>
   );
-}
+};
+
+export default TransitionMenu;
