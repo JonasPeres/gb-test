@@ -10,7 +10,6 @@ export async function listSkus(params?: {
   page?: number;
   limit?: number;
   status?: SkuStatus;
-  q?: string;
 }) {
   const { data } = await http.get<ApiList<Sku>>("/skus", { params });
   return data;

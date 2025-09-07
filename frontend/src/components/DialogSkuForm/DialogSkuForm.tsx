@@ -35,7 +35,6 @@ const DialogSkuForm: React.FC<DialogSkuFormProps> = ({
   onClose,
   onSubmit,
   sku,
-  title = "Novo SKU",
 }) => {
   const defaultValues = useMemo(
     () => ({
@@ -74,7 +73,7 @@ const DialogSkuForm: React.FC<DialogSkuFormProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box component="form" onSubmit={handleFormSubmit} noValidate>
         <DialogTitle sx={{ fontWeight: 600 }}>
-          {title}
+          {sku ? "Editar SKU" : "Novo SKU"}
           <IconButton
             aria-label="close"
             onClick={onClose}

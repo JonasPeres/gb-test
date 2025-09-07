@@ -41,10 +41,16 @@ describe("DialogSkuForm", () => {
     expect(screen.getByLabelText("Descrição Comercial")).toBeInTheDocument();
   });
 
-  it("should render custom title when provided", () => {
-    render(<DialogSkuForm {...defaultProps} open={true} title="Editar SKU" />);
+  it("should render 'Editar SKU' as title when sku prop is provided", () => {
+    render(<DialogSkuForm {...defaultProps} open={true} sku={mockSku} />);
 
     expect(screen.getByText("Editar SKU")).toBeInTheDocument();
+  });
+
+  it("should render 'Novo SKU' as title when sku prop is not provided", () => {
+    render(<DialogSkuForm {...defaultProps} open={true} />);
+
+    expect(screen.getByText("Novo SKU")).toBeInTheDocument();
   });
 
   it("should call onClose when close button is clicked", async () => {

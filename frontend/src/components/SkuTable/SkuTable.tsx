@@ -89,6 +89,7 @@ const SkuTable: React.FC<SkuTableProps> = ({
                   const isEditDisabled = [
                     SkuStatusEnum.CANCELADO,
                     SkuStatusEnum.DESATIVADO,
+                    SkuStatusEnum.ATIVO,
                   ].includes(item.status);
 
                   return (

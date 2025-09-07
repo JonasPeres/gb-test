@@ -43,27 +43,34 @@ const mockSkus: Sku[] = [
     sku: "SKU-002",
     descricao: "Produto 2",
     descricaoComercial: "Produto Comercial 2",
-    status: SkuStatusEnum.ATIVO,
+    status: SkuStatusEnum.CADASTRO_COMPLETO,
   },
   {
     id: "3",
     sku: "SKU-003",
     descricao: "Produto 3",
     descricaoComercial: "Produto Comercial 3",
-    status: SkuStatusEnum.CANCELADO,
+    status: SkuStatusEnum.ATIVO,
   },
   {
     id: "4",
     sku: "SKU-004",
     descricao: "Produto 4",
     descricaoComercial: "Produto Comercial 4",
+    status: SkuStatusEnum.CANCELADO,
+  },
+  {
+    id: "5",
+    sku: "SKU-005",
+    descricao: "Produto 5",
+    descricaoComercial: "Produto Comercial 5",
     status: SkuStatusEnum.DESATIVADO,
   },
 ];
 
 const mockApiResponse: ApiList<Sku> = {
   items: mockSkus,
-  total: 4,
+  total: 5,
 };
 
 const createMockQuery = (
@@ -293,6 +300,17 @@ describe("SkuTable", () => {
       expect(deactivatedSkuEditButton).toBeDisabled();
     });
 
+    it("should disable edit button for ATIVO status", () => {
+      const mockQuery = createMockQuery(mockApiResponse);
+
+      render(<SkuTable {...defaultProps} listSkusQuery={mockQuery} />);
+
+      const editButtons = screen.getAllByRole("button", { name: "Editar SKU" });
+      const activeSkuEditButton = editButtons[2];
+
+      expect(activeSkuEditButton).toBeDisabled();
+    });
+
     it("should enable edit button for other statuses", () => {
       const mockQuery = createMockQuery(mockApiResponse);
 
@@ -300,10 +318,10 @@ describe("SkuTable", () => {
 
       const editButtons = screen.getAllByRole("button", { name: "Editar SKU" });
       const preCadastroEditButton = editButtons[0];
-      const ativoEditButton = editButtons[1];
+      const cadastroCompletoEditButton = editButtons[1];
 
       expect(preCadastroEditButton).not.toBeDisabled();
-      expect(ativoEditButton).not.toBeDisabled();
+      expect(cadastroCompletoEditButton).not.toBeDisabled();
     });
   });
 
@@ -322,7 +340,7 @@ describe("SkuTable", () => {
       });
     });
 
-    it("should show disabled tooltip for CANCELADO status", async () => {
+    it("should show disabled tooltip for ATIVO status", async () => {
       const user = userEvent.setup();
       const mockQuery = createMockQuery(mockApiResponse);
 
@@ -331,6 +349,24 @@ describe("SkuTable", () => {
       const editButton = screen.getAllByRole("button", {
         name: "Editar SKU",
       })[2];
+      await user.hover(editButton.parentElement!);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Não é possível editar um SKU com status ativo/)
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("should show disabled tooltip for CANCELADO status", async () => {
+      const user = userEvent.setup();
+      const mockQuery = createMockQuery(mockApiResponse);
+
+      render(<SkuTable {...defaultProps} listSkusQuery={mockQuery} />);
+
+      const editButton = screen.getAllByRole("button", {
+        name: "Editar SKU",
+      })[3];
       await user.hover(editButton.parentElement!);
 
       await waitFor(() => {
@@ -348,7 +384,7 @@ describe("SkuTable", () => {
 
       const editButton = screen.getAllByRole("button", {
         name: "Editar SKU",
-      })[3];
+      })[4];
       await user.hover(editButton.parentElement!);
 
       await waitFor(() => {
@@ -493,8 +529,8 @@ describe("SkuTable", () => {
       ).toBeInTheDocument();
       expect(
         screen.getAllByRole("button", { name: "Editar SKU" })
-      ).toHaveLength(4);
-      expect(screen.getAllByLabelText("Excluir SKU")).toHaveLength(4);
+      ).toHaveLength(5);
+      expect(screen.getAllByLabelText("Excluir SKU")).toHaveLength(5);
     });
 
     it("should have proper table structure", () => {
@@ -504,7 +540,7 @@ describe("SkuTable", () => {
 
       expect(screen.getByRole("table")).toBeInTheDocument();
       expect(screen.getAllByRole("columnheader")).toHaveLength(5);
-      expect(screen.getAllByRole("row")).toHaveLength(5);
+      expect(screen.getAllByRole("row")).toHaveLength(6);
     });
   });
 
