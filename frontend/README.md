@@ -116,6 +116,14 @@ src/
 
 ---
 
+## 💡 Possíveis Melhorias
+
+- **Desacoplar Lógica de Negócio**: As regras de transição de status estão replicadas no código do frontend (em `src/state/transition.ts`). Isso cria um acoplamento indesejado com o backend. A solução ideal seria a API fornecer quais são as transições possíveis para um determinado SKU, tornando o frontend mais dinâmico e evitando inconsistências se as regras de negócio mudarem.
+- **Aumentar Cobertura de Testes**
+- **Refatorar Componentes de Diálogo**: Existem dois componentes de diálogo (`DialogSkuForm` e `DialogSkuDeleteConfirm`) com estruturas semelhantes. Eles poderiam ser refatorados para usar um componente `BaseDialog` genérico, que centralizaria a lógica de estado (abrir/fechar) e o layout (título, ações), reduzindo a duplicação de código.
+
+---
+
 ## ✨ Boas Práticas e Decisões de Arquitetura
 
 - **Gerenciamento de Estado de Servidor com TanStack Query**: Em vez de `useState` ou Redux para dados da API, o projeto utiliza TanStack Query (`@tanstack/react-query`) para lidar com fetching, caching, invalidação de cache e estado de mutações (loading/error/success). Isso simplifica o código, evita re-fetches desnecessários e melhora a experiência do usuário.

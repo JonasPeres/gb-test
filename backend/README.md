@@ -162,6 +162,16 @@ A documentação completa e interativa está disponível via **Swagger** em [`/d
 
 ---
 
+## 💡 Possíveis Melhorias
+
+A implementação atual é funcional e atende aos requisitos, mas alguns pontos foram simplificados devido ao tempo e poderiam ser aprimorados em futuras iterações para alinhar o projeto a práticas de arquitetura mais robustas.
+
+- **Refatorar `SkuService` para Use Cases**: A classe `SkuService` atualmente concentra toda a lógica de negócio e o acesso a dados. Para melhorar a separação de responsabilidades e facilitar a manutenção, a lógica de negócio poderia ser extraída para classes de _Use Case_ específicas (ex: `CreateSkuUseCase`, `TransitionSkuStatusUseCase`), alinhando a arquitetura com princípios de _Clean Architecture_.
+- **Aumentar a Cobertura dos Testes de Controller**: Os testes para o `SkuController` atualmente utilizam mocks do serviço, validando apenas se os métodos do serviço são chamados. Uma melhoria seria substituir esses testes por testes de integração (ou E2E) que façam requisições HTTP reais, garantindo que os DTOs, _pipes_ de validação e a serialização da resposta funcionem corretamente de ponta a ponta.
+- **Documentação da API**: Embora o Swagger gere uma documentação básica, ela poderia ser enriquecida com descrições mais detalhadas para os `endpoints` e exemplos de respostas de erro, melhorando a experiência para quem consome a API.
+
+---
+
 ## ✨ Qualidade de Código e Boas Práticas
 
 - **Setup Automatizado com Entrypoint**: O `entrypoint.sh` no Docker detecta se o banco precisa de migrations ou seed, automatizando o setup e melhorando a DX.
