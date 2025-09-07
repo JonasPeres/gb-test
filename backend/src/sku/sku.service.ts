@@ -47,7 +47,7 @@ export class SkuService {
         where,
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma['sku'].count({ where }),
     ]);
