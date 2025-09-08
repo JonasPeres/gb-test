@@ -22,7 +22,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
-    "seed": "ts-node --transpile-only prisma/seed.js"
+    "seed": "ts-node --transpile-only prisma/seed.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

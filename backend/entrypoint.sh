@@ -11,7 +11,7 @@ else
 fi
 
 echo "🌱 rodando seed..."
-node prisma/seed.js || true
+node prisma/seed.mjs || true
 echo "Seed concluído"
 
 START_FILE=""

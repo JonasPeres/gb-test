@@ -131,6 +131,9 @@ function App() {
     if (confirmDelete) {
       deleteSkuMutation.mutate(confirmDelete.id, {
         onSuccess: () => {
+          if (page > 1 && listSkusQuery.data?.items.length === 1) {
+            setPage((prev) => Math.max(prev - 1, 1));
+          }
           showSnackbar("SKU removido com sucesso!", "success");
           setConfirmDelete(null);
         },
@@ -140,7 +143,13 @@ function App() {
         },
       });
     }
-  }, [confirmDelete, deleteSkuMutation, showSnackbar]);
+  }, [
+    confirmDelete,
+    deleteSkuMutation,
+    listSkusQuery.data?.items.length,
+    page,
+    showSnackbar,
+  ]);
 
   const handleStatusChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
